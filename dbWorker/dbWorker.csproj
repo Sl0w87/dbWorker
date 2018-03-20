@@ -7,6 +7,5 @@
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.1.1"/>
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="5.12.1"/>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.1"/>
-    <PackageReference Include="LibZ.Tool" Version="1.2.0"/>
   </ItemGroup>
 </Project>
