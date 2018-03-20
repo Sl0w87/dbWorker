@@ -7,7 +7,7 @@ namespace dbWorker
 {
     public class Config
     {
-        static readonly string appPath = Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path));
+        static readonly string appPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         static readonly string configPath = Path.Combine(appPath, "config.json");
         static readonly string scriptPath = Path.Combine(appPath, "Scripts");
         public Connection Con { get; set; }
@@ -21,6 +21,7 @@ namespace dbWorker
 
         public static Config Load()
         {
+            Console.WriteLine(configPath);
             string jsonFile = "";
             if (!File.Exists(configPath))
             {
