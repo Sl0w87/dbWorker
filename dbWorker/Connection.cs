@@ -30,20 +30,20 @@ namespace dbWorker
         public override string ToString()
         {            
             return 
-                $"User={User}" +
-                $"Password={Password}" +
-                $"Database={Database}" +
-                $"DataSource={DataSource}" +
-                $"Port={Port}" +
-                $"Dialect={Dialect}" +
-                $"Charset={Charset}" +
-                $"Role={Role}" +
-                $"Connection={_Connection}" +
-                $"Pooling={Pooling}" +
-                $"MinPoolSize={MinPoolSize}" +
-                $"MaxPoolSize={MaxPoolSize}" +
-                $"PackSize={PackSize}" +
-                $"ServerType={ServerType}";
+                $"User={User};" +
+                $"Password={Password};" +
+                $"Database={Database};" +
+                $"DataSource={DataSource};" +
+                $"Port={Port};" +
+                $"Dialect={Dialect};" +
+                $"Charset={Charset};" +
+                $"Role={Role};" +
+                $"Connection={_Connection};" +
+                $"Pooling={Pooling};" +
+                $"MinPoolSize={MinPoolSize};" +
+                $"MaxPoolSize={MaxPoolSize};" +
+                $"PackSize={PackSize};" +
+                $"ServerType={ServerType};";
         }
     }
 }

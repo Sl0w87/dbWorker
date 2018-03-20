@@ -17,23 +17,25 @@ namespace dbWorker
         private void OnExecuteAsync()
         {
             var conf = Config.Load();
+            var connectionString = conf.Con.ToString();
             var fileCount = 0;
             var scriptFile = "";
 
             try
             {                
                 var scriptPath = ScriptPath?? conf.ScriptPath;
+                var files = Directory.GetFiles(scriptPath); 
                 if (!String.IsNullOrWhiteSpace(scriptPath) && 
-                    Directory.Exists(scriptPath))
-                {
-                    var files = Directory.GetFiles(scriptPath);
+                    Directory.Exists(scriptPath) &&
+                    files.Length > 0)
+                {                               
                     foreach (var file in files)
                     {
-                        fileCount++;
-                        Console.WriteLine(fileCount + ":" + file);
+                        fileCount++;                    
+                        Console.WriteLine($"{fileCount} = {Path.GetFileName(file)}");
                     }
                     var fileIdent = Prompt.GetInt("Choose script:");
-                    scriptFile = File.ReadAllText(files[fileIdent]);
+                    scriptFile = File.ReadAllText(files[--fileIdent]);
                 }            
             }
             catch(Exception ex)
@@ -51,8 +53,7 @@ namespace dbWorker
 
             try
             {
-                var connecion = new Connection();
-                using (FbConnection fbConnection = new FbConnection(connecion.ToString()))
+                using (FbConnection fbConnection = new FbConnection(connectionString))
                 {
                     if (fbConnection == null)
                     {
@@ -62,8 +63,17 @@ namespace dbWorker
                     fbConnection.Open();
                     try
                     {
-                        FbCommand fbCommand = new FbCommand(scriptFile, fbConnection);
-                        fbCommand.ExecuteNonQuery();
+                        try
+                        {   
+                            FbCommand fbCommand = fbConnection.CreateCommand();
+                            fbCommand.CommandText = scriptFile;
+                            fbCommand.ExecuteNonQuery();
+                        }
+                        catch (Exception Ex)
+                        {
+                            Console.WriteLine(Ex.Message);
+                            return;
+                        }
                     }
                     finally
                     {
