@@ -21,7 +21,9 @@ namespace dbWorker
 
         public static Config Load()
         {
-            Console.WriteLine(configPath);
+            if (!Directory.Exists(scriptPath))
+                Directory.CreateDirectory(scriptPath);
+
             string jsonFile = "";
             if (!File.Exists(configPath))
             {
@@ -30,7 +32,7 @@ namespace dbWorker
             }
             else
                 jsonFile = File.ReadAllText(configPath);
-            return JsonConvert.DeserializeObject<Config>(jsonFile);
+            return JsonConvert.DeserializeObject<Config>(jsonFile);            
         }
     }
 }
