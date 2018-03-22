@@ -1,38 +1,56 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace dbWorker
 {
     public class Config
-    {
-        static readonly string appPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-        static readonly string configPath = Path.Combine(appPath, "config.json");
-        static readonly string scriptPath = Path.Combine(appPath, "Scripts");
-        public Connection Con { get; set; }
+    {        
+        readonly string _path;
+        readonly string _configPath;
+        public List<Connection> Connections { get; set; }
         public string ScriptPath { get; set; }
 
-        public Config()
+        private Config()
         {
-            ScriptPath = scriptPath;
-            Con = new Connection();
+
+        }        
+        public Config(string path)
+        {
+            _path = path;
+            if (_path != null)
+            {
+                _configPath = Path.Combine(_path, "config.json");
+                ScriptPath = Path.Combine(_path, "Scripts");
+            }
+            Connections = new List<Connection>();
+        }
+        public bool Exist()
+        {
+            return File.Exists(_configPath);
+        }
+        public void Load(bool createScriptFileFolder = true)
+        {
+            if (createScriptFileFolder && ScriptPath != null && !Directory.Exists(ScriptPath))
+                Directory.CreateDirectory(ScriptPath);
+
+            if (Exist())
+            {
+                string jsonFile =  File.ReadAllText(_configPath);
+                
+                var config = JsonConvert.DeserializeObject<Config>(jsonFile);
+                this.Connections = config.Connections;
+                this.ScriptPath = config.ScriptPath;
+            }
         }
 
-        public static Config Load()
+        public void Save()
         {
-            if (!Directory.Exists(scriptPath))
-                Directory.CreateDirectory(scriptPath);
-
-            string jsonFile = "";
-            if (!File.Exists(configPath))
-            {
-                jsonFile = JsonConvert.SerializeObject(new Config(), formatting: Formatting.Indented);
-                File.WriteAllText(configPath, jsonFile);
-            }
-            else
-                jsonFile = File.ReadAllText(configPath);
-            return JsonConvert.DeserializeObject<Config>(jsonFile);            
+            var jsonFile = JsonConvert.SerializeObject(this, formatting: Formatting.Indented);
+            File.WriteAllText(_configPath, jsonFile);
         }
     }
 }
