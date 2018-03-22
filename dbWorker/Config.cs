@@ -10,9 +10,9 @@ namespace dbWorker
     public class Config
     {        
         readonly string _path;
-        readonly string _configPath;
         public List<Connection> Connections { get; set; }
         public string ScriptPath { get; set; }
+        public readonly string ConfigPath;
 
         private Config()
         {
@@ -23,14 +23,14 @@ namespace dbWorker
             _path = path;
             if (_path != null)
             {
-                _configPath = Path.Combine(_path, "config.json");
+                ConfigPath = Path.Combine(_path, "config.json");
                 ScriptPath = Path.Combine(_path, "Scripts");
             }
             Connections = new List<Connection>();
         }
         public bool Exist()
         {
-            return File.Exists(_configPath);
+            return File.Exists(ConfigPath);
         }
         public void Load(bool createScriptFileFolder = true)
         {
@@ -39,7 +39,7 @@ namespace dbWorker
 
             if (Exist())
             {
-                string jsonFile =  File.ReadAllText(_configPath);
+                string jsonFile =  File.ReadAllText(ConfigPath);
                 
                 var config = JsonConvert.DeserializeObject<Config>(jsonFile);
                 this.Connections = config.Connections;
@@ -50,7 +50,7 @@ namespace dbWorker
         public void Save()
         {
             var jsonFile = JsonConvert.SerializeObject(this, formatting: Formatting.Indented);
-            File.WriteAllText(_configPath, jsonFile);
+            File.WriteAllText(ConfigPath, jsonFile);
         }
     }
 }

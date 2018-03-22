@@ -11,8 +11,6 @@ namespace dbWorker
     [HelpOption]
     class Program
     {
-        [Option(Description="Script path")]
-        public string ScriptPath { get; }
         public static void Main(string[] args) => CommandLineApplication.Execute<Program>(args);
         private Config loadConfig()
         {         
@@ -30,7 +28,7 @@ namespace dbWorker
             foreach (var item in connections)
             {
                 index++;
-                Console.WriteLine($"[{index}]: {item.DataSource}/{item.Port}");
+                Console.WriteLine($"[{index}]: {item.Name} ({item.DataSource}/{item.Port})");
             } 
             var connectionIdent = Prompt.GetInt("Choose connection: ");
 
@@ -43,7 +41,7 @@ namespace dbWorker
             foreach (var item in connection.Databases)
             {
                 index++;
-                Console.WriteLine($"[{index}]: {item.Path}");
+                Console.WriteLine($"[{index}]: {item.Name} ({item.Path})");
             } 
             var databaseIdent = Prompt.GetInt("Choose database: ");
 
@@ -62,28 +60,34 @@ namespace dbWorker
             var fileIdent = Prompt.GetInt("Choose script: ");
             return files[--fileIdent];
         }
-        private void firstConfiguration(ref Config conf)
+        private Connection configureNewServer()
         {
             Console.WriteLine("Configure server");
             var serverType = Prompt.GetInt("ServerType (0 = remote; 1 = embedded) [default = 0]: ");
             var dataSource = Prompt.GetString("DataSource [default = localhost]: ");
             var port = Prompt.GetInt("Port [default = 3050]: ");
-
-            Console.WriteLine("Configure database");
-            var databasePath = Prompt.GetString("Database path: ");
-            var user = Prompt.GetString("User [default = SYSDBA]: ");
-            var password = Prompt.GetPassword("Password [default = masterkey]: ");
+            var connectionName = Prompt.GetPassword("Name: ");
             
             var con = new Connection();
             con.ServerType = serverType;
             con.DataSource = dataSource;
             con.Port = port;
-            var database = new Database(con);
+            con.Name = connectionName; 
+            return con;    
+        }
+        private Database configureNewDatabase()
+        {            
+            Console.WriteLine("Configure database");
+            var databasePath = Prompt.GetString("Database path: ");
+            var user = Prompt.GetString("User [default = SYSDBA]: ");
+            var password = Prompt.GetPassword("Password [default = masterkey]: ");
+            var databaseName = Prompt.GetPassword("Name: ");
+            var database = new Database();
             database.Password = password;
             database.Path = databasePath;
             database.User = user;
-            con.Databases.Add(database);
-            conf.Connections.Add(con);        
+            database.Name = databaseName;
+            return database;
         }
         private void OnExecuteAsync()
         {
@@ -101,8 +105,12 @@ namespace dbWorker
             {
                 try
                 {                    
-                    firstConfiguration(ref conf);
+                    var server = configureNewServer();
+                    var db = configureNewDatabase();
+                    server.Databases.Add(db);
+                    conf.Connections.Add(server);
                     conf.Save();
+                    Console.WriteLine($"Configuration file has been saved at {conf.ConfigPath}");
                 }
                 catch (Exception ex)
                 {
@@ -172,14 +180,14 @@ namespace dbWorker
             }            
             try
             {
-               Command.ExecuteCommand(database, scriptText);
+               Command.ExecuteCommand(connection, database, scriptText);
+               Console.WriteLine("Script executed");
             }            
             catch(Exception ex)
             {
                 Console.WriteLine(String.Concat("Error while trying to communicate with database.", Environment.NewLine, ex.Message));
                 return;
             }
-            Console.WriteLine("Script executed");
         }
     }
 }

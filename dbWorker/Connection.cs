@@ -4,6 +4,7 @@ namespace dbWorker
 {
     public class Connection
     {
+        public string Name { get; set; }
         public string DataSource { get; set; }
         public int Port { get; set; }
         public bool Pooling { get; set; }
@@ -17,10 +18,6 @@ namespace dbWorker
             DataSource = "localhost";
             Port = 3050;
             Databases = new List<Database>();
-        }
-        public string GetConnectionString(Database database)
-        {            
-            return database.ConnectionString;
         }
     }
 }
