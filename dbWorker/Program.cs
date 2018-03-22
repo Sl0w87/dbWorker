@@ -66,14 +66,14 @@ namespace dbWorker
             var serverType = Prompt.GetInt("ServerType (0 = remote; 1 = embedded) [default = 0]: ");
             var dataSource = Prompt.GetString("DataSource [default = localhost]: ");
             var port = Prompt.GetInt("Port [default = 3050]: ");
-            var connectionName = Prompt.GetPassword("Name: ");
+            var connectionName = Prompt.GetString("Name: ");
             
             var con = new Connection();
             con.ServerType = serverType;
             con.DataSource = dataSource;
             con.Port = port;
-            con.Name = connectionName; 
-            return con;    
+            con.Name = connectionName;
+            return con;
         }
         private Database configureNewDatabase()
         {            
@@ -81,7 +81,7 @@ namespace dbWorker
             var databasePath = Prompt.GetString("Database path: ");
             var user = Prompt.GetString("User [default = SYSDBA]: ");
             var password = Prompt.GetPassword("Password [default = masterkey]: ");
-            var databaseName = Prompt.GetPassword("Name: ");
+            var databaseName = Prompt.GetString("Name: ");
             var database = new Database();
             database.Password = password;
             database.Path = databasePath;
