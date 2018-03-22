@@ -4,7 +4,7 @@ namespace dbWorker
 {
     public static class Command
     {
-        public static void ExecuteCommand(Connection connection, Database database, string command)
+        public static int ExecuteCommand(Connection connection, Database database, string command)
         {
             using (FbConnection fbConnection = new FbConnection(database.GetConnectionString(connection)))
             {
@@ -13,7 +13,7 @@ namespace dbWorker
                 {
                     FbCommand fbCommand = fbConnection.CreateCommand();
                     fbCommand.CommandText = command;
-                    fbCommand.ExecuteNonQuery();                   
+                    return fbCommand.ExecuteNonQuery();                   
                 }
                 finally
                 {

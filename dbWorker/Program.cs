@@ -63,9 +63,9 @@ namespace dbWorker
         private Connection configureNewServer()
         {
             Console.WriteLine("Configure server");
-            var serverType = Prompt.GetInt("ServerType (0 = remote; 1 = embedded) [default = 0]: ");
-            var dataSource = Prompt.GetString("DataSource [default = localhost]: ");
-            var port = Prompt.GetInt("Port [default = 3050]: ");
+            var serverType = Prompt.GetInt("ServerType (0 = remote; 1 = embedded): ", 0);
+            var dataSource = Prompt.GetString("DataSource: ", "localhost");
+            var port = Prompt.GetInt("Port: ", 3050);
             var connectionName = Prompt.GetString("Name: ");
             
             var con = new Connection();
@@ -79,8 +79,8 @@ namespace dbWorker
         {            
             Console.WriteLine("Configure database");
             var databasePath = Prompt.GetString("Database path: ");
-            var user = Prompt.GetString("User [default = SYSDBA]: ");
-            var password = Prompt.GetPassword("Password [default = masterkey]: ");
+            var user = Prompt.GetString("User: ", "SYSDBA");
+            var password = Prompt.GetString("Password: ", "masterkey");
             var databaseName = Prompt.GetString("Name: ");
             var database = new Database();
             database.Password = password;
@@ -88,6 +88,34 @@ namespace dbWorker
             database.User = user;
             database.Name = databaseName;
             return database;
+        }
+        private void ExecuteScript(Connection connection, Database database, string scriptFile)
+        {
+            string scriptText;
+            try
+            {                
+                scriptText = File.ReadAllText(scriptFile);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error on reading script file: {ex.Message}");
+                return;
+            }
+            if (scriptFile.Length == 0)
+            {
+                Console.WriteLine("Script file is empty.");
+                return;
+            }            
+            try
+            {
+               var rowsAffected = Command.ExecuteCommand(connection, database, scriptText);
+               Console.WriteLine("Script executed: Rows affected = {rowsAffected}");
+            }            
+            catch(Exception ex)
+            {
+                Console.WriteLine(String.Concat("Error while trying to communicate with database.", Environment.NewLine, ex.Message));
+                return;
+            }
         }
         private void OnExecuteAsync()
         {
@@ -148,46 +176,26 @@ namespace dbWorker
                 Console.WriteLine("Not a valid database.");
                 return;
             }
-            string scriptFile;
-            try
+
+            do
             {
-                scriptFile = ChooseScriptFile(conf.ScriptPath);                            
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error on getting script file: {ex.Message}");
-                return;
-            }
-            if (scriptFile.Length == 0)
-            {
-                Console.WriteLine("Not a valid script file.");
-                return;
-            }
-            string scriptText;
-            try
-            {                
-                scriptText = File.ReadAllText(scriptFile);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error on reading script file: {ex.Message}");
-                return;
-            }
-            if (scriptFile.Length == 0)
-            {
-                Console.WriteLine("Script file is empty.");
-                return;
-            }            
-            try
-            {
-               Command.ExecuteCommand(connection, database, scriptText);
-               Console.WriteLine("Script executed");
-            }            
-            catch(Exception ex)
-            {
-                Console.WriteLine(String.Concat("Error while trying to communicate with database.", Environment.NewLine, ex.Message));
-                return;
-            }
+                string scriptFile;
+                try
+                {
+                    scriptFile = ChooseScriptFile(conf.ScriptPath);                            
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error on getting script file: {ex.Message}");
+                    return;
+                }
+                if (scriptFile.Length == 0)
+                {
+                    Console.WriteLine("Not a valid script file.");
+                    return;
+                }
+                ExecuteScript(connection, database, scriptFile);
+            } while (Prompt.GetYesNo("Execute another script?", true));            
         }
     }
 }
