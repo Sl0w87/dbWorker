@@ -1,6 +1,6 @@
 using FirebirdSql.Data.FirebirdClient;
 
-namespace dbWorker
+namespace dbWorker.Firebird
 {
     public static class Command
     {

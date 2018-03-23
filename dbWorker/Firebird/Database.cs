@@ -1,4 +1,4 @@
-namespace dbWorker
+namespace dbWorker.Firebird
 {
     public class Database
     {

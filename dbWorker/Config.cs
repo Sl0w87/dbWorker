@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using dbWorker.Firebird;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -12,7 +13,7 @@ namespace dbWorker
         readonly string _path;
         public List<Connection> Connections { get; set; }
         public string ScriptPath { get; set; }
-        public readonly string ConfigPath;
+        private readonly string ConfigPath;
 
         private Config()
         {

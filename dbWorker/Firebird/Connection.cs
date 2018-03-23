@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace dbWorker
+namespace dbWorker.Firebird
 {
     public class Connection
     {
