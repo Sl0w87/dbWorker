@@ -17,13 +17,15 @@ namespace dbWorker
     Subcommand("AddDatabase", typeof(AddDatabaseCommand)),
     Subcommand("RemoveDatabase", typeof(DeleteDatabaseCommand)),
     Subcommand("ExecuteScript", typeof(ExecuteScriptCommand)),
-    Subcommand("Manager", typeof(ManagerCommand))]
+    Subcommand("Manager", typeof(ManagerCommand)),
+    Subcommand("AutoConfigure", typeof(AutoConfigurationCommand))]
     class Program
     {
         public static void Main(string[] args) => CommandLineApplication.Execute<Program>(args);
         private void OnExecute()
         {
-            CommandLineApplication.Execute<ManagerCommand>();
+            // CommandLineApplication.Execute<ManagerCommand>();
+            CommandLineApplication.Execute<AutoConfigurationCommand>();
         }              
     }
 }
